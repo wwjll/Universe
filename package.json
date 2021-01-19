@@ -1,0 +1,14 @@
+{
+  "name": "universe",
+  "description": "This project is some demos about integrating Three.js with Cesium. It is form cesium's official website(https://cesium.com/blog/2017/10/23/integrating-cesium-with-threejs/).",
+  "version": "1.0.0",
+  "main": "universe.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.87.0"
+  }
+}
