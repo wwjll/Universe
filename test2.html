@@ -146,13 +146,15 @@
               var geometry = new THREE.LatheGeometry(points);
               var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
               latheMesh.scale.set(1500, 1500, 1500); //scale object to be visible at planet scale
-              // translate "up" in Three.js space so the "bottom" of the mesh is the handle
-              latheMesh.position.z += 15000.0; 
-              // let h = getHeight(latheMesh)
-              latheMesh.rotateX(Math.PI / 2)
+
               var axes = new THREE.AxesHelper(1000 * 50)
               axes.position.copy(latheMesh.position)
               axes.rotateX(Math.PI / 2)
+
+              // translate "up" in Three.js space so the "bottom" of the mesh is the handle
+              latheMesh.position.z += 15000.0; 
+              latheMesh.rotateX(Math.PI / 2)
+              window.mesh = latheMesh
               //
               var latheMeshYup = new THREE.Group();
               latheMeshYup.add(latheMesh)
@@ -165,13 +167,12 @@
               _3DOB.minWGS84 = minWGS84;
               _3DOB.maxWGS84 = maxWGS84;
               _3Dobjects.push(_3DOB);
-
               // dodecahedron
               geometry = new THREE.DodecahedronGeometry();
               var dodecahedronMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
               dodecahedronMesh.scale.set(5000, 5000, 5000); //scale object to be visible at planet scale
               dodecahedronMesh.position.z += 15000.0;
-              dodecahedronMesh.rotateX(Math.PI / 2)
+              // dodecahedronMesh.rotateX(Math.PI / 2)
               var dodecahedronMeshYup = new THREE.Group();
               dodecahedronMeshYup.add(dodecahedronMesh)
               three.scene.add(dodecahedronMeshYup); // don’t forget to add it to the Three.js scene manually
@@ -188,12 +189,9 @@
           function renderCesium() {
               cesium.viewer.render();
           }
-          function renderThreeObj() {
+          function renderThreeObj() { 
               // register Three.js scene with Cesium
-              // console.log( Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy), three.camera.fov)
               three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy) // ThreeJS FOV is vertical
-              three.camera.updateProjectionMatrix();
-              // console.log( Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy), three.camera.fov)
 
               var cartToVec = function (cart) {
                   return new THREE.Vector3(cart.x, cart.y, cart.z);
@@ -238,7 +236,6 @@
                 cvm[2], cvm[6], cvm[10], cvm[14],
                 cvm[3], cvm[7], cvm[11], cvm[15]
               );
-              three.camera.updateProjectionMatrix();
               var width = ThreeContainer.clientWidth;
               var height = ThreeContainer.clientHeight;
               var aspect = width / height;

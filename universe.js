@@ -1,6 +1,6 @@
 function getHeight(obj) {
   // 求解 threeObj 在 y 方向上的长度
-  // 用于 物体局部坐标系转换, 保证绕 X 轴旋转 90 度后底部处于 Z 平面上
+  // 用于 物体局部坐标系转换, 保证绕物体绕 X 轴旋转 90 度后底部处于 Cesium Z 平面上
   vertices = obj.geometry.vertices
   let y_arr = vertices.reduce((prev, cur) => {
 
@@ -18,13 +18,13 @@ function getHeight(obj) {
 
 
 function Universe() {
-  // 同步器列表, 
-  this.syncList = []
-  this._threeObjs = []
+  this._threeGroups = []
+  this.ThreeContainer = document.getElementById("ThreeContainer")
 }
 Object.assign(Universe.prototype, {
 
   collide: function() {
+    console.warn(THREE.REVISION)
     return new Promise((resolve, reject) => {
       three = Object.create(null)
       cesium = Object.create(null)
@@ -37,7 +37,6 @@ Object.assign(Universe.prototype, {
         far = 10 * 1000 * 1000
       )
   
-      let ThreeContainer = document.getElementById("ThreeContainer")
       let canvas = document.createElement( 'canvas' )
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -46,11 +45,11 @@ Object.assign(Universe.prototype, {
         antialias: true 
       })
       three.renderer = new THREE.WebGLRenderer({ 
-        canvas: ThreeContainer,
+        canvas: this.ThreeContainer,
         context: context
       })
   
-      ThreeContainer.appendChild(canvas)
+      this.ThreeContainer.appendChild(canvas)
       // 
       cesium.viewer = function() {
         return new Cesium.Viewer('cesiumContainer', {
@@ -72,10 +71,10 @@ Object.assign(Universe.prototype, {
             fullscreenElement: 'cesiumContainer'
           });
       }()
-  
+      // 预先同步一些属性
+      three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy)
       this.three = three
       this.cesium = cesium
-      // this._3dObjects = []
       // 
       resolve({ cesium, three })
     })
@@ -85,18 +84,44 @@ Object.assign(Universe.prototype, {
   cartToVec: function(cart) {
     return new THREE.Vector3(cart.x, cart.y, cart.z)
   },
+  createGroup: function(boundary) {
+    /*
+    / 创建一个新的基坐标, 把创建的 threeObj 置该基坐标下
+    / 基座标原点位于 bounday 中心点
+    / 每帧更新该基座标使得物体位于正确的 cesium 地球表面
+    */
+    let { minWGS84, maxWGS84 } = boundary
+    let group = new THREE.Group()
+    group.boundary = boundary
 
-  modifyThreeObj: function(mesh, boundary, autoAdd) {
+    let center = Cesium.Cartesian3.fromDegrees(
+      (minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2
+    )
+
+    let topLeft = this.cartToVec(
+      Cesium.Cartesian3.fromDegrees(minWGS84[0], minWGS84[1])
+    )
+
+    let bottomLeft = this.cartToVec(
+      Cesium.Cartesian3.fromDegrees(minWGS84[0], maxWGS84[1])
+    )
+
+    let rangeNorm = Cesium.Cartesian3.fromDegrees((minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2, 1)
+    let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize()
+
+    group.center = center
+    // 基平面法向量
+    group.rangeNorm = rangeNorm
+    group.latDir = latDir
+    this._threeGroups.push(group)
+    this.three.scene.add(group)
+    return group
+  },
+  modifyThreeObj: function(mesh, group) {
+    // debugger
     // 保证转换后的 mesh 坐标在 cesium 球面以上
-    mesh.position.z += getHeight(mesh)
-    mesh.rotateX(Math.PI / 2)
-    mesh.boundary = boundary
-    this._threeObjs.push(mesh)
-    if (autoAdd) {
-      this.three.scene.add(mesh)
-    }
-    return mesh
-
+    mesh.position.y += getHeight(mesh)
+    group.add(mesh)
   },
   createPlane: function(boundary, flyto) {
     // 根据区域划分生成 Cesium 平面
@@ -135,46 +160,33 @@ Object.assign(Universe.prototype, {
     }
   },
 
-  syncThreeObj: function(mesh, offset) {
-    // 同步 threeObj 自身的坐标系
-    let { minWGS84, maxWGS84 } = mesh.boundary
+  syncGroup: function(group, offset) {
+    // 物体局部基坐标系永远朝向球心
+    let { center, rangeNorm, latDir } = group
+    // 先平移
+    group.position.copy(center)
+    // 再旋转
+    group.lookAt(rangeNorm.x, rangeNorm.y, rangeNorm.z)
+    // 旋转基坐标使得 y 轴为上
+    group.rotateX(Math.PI / 2)
+    // 最后调整偏移(也是一次旋转)
+    group.up.copy(latDir)
 
-    let center = Cesium.Cartesian3.fromDegrees(
-      (minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2
-    )
-
-    let topLeft = this.cartToVec(
-      Cesium.Cartesian3.fromDegrees(minWGS84[0], minWGS84[1])
-    )
-
-    let bottomLeft = this.cartToVec(
-      Cesium.Cartesian3.fromDegrees(minWGS84[0], maxWGS84[1])
-    )
-
-    let rangeNorm = Cesium.Cartesian3.fromDegrees((minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2, 1)
-
-    let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize()
-    // 方位校准
-    mesh.position.copy(center)
-    // if(THREE.REVISION > )
-    // mesh.lookAt(rangeNorm)
-    mesh.lookAt(rangeNorm.x, rangeNorm.y, rangeNorm.z)
-    mesh.up.copy(latDir)
-    console.log(mesh)
     if (offset) {
       // 在 球面 划定 区域内偏移
+      // TODO: need to be test
       let { lng, lat } = offSet
       let cart3 = Cesium.Cartesian3.fromDegrees(lng, lat)
-      mesh.position.set(cart3.x, cart3.y, cart3.z)
+      group.position.set(cart3.x, cart3.y, cart3.z)
     }
   },
 
   syncThree: function() {
-    const { three, cesium } = this
     const _this = this
-    console.log()
     // 同步 threeObj 自身的坐标系
-    this._threeObjs.forEach( mesh => _this.syncThreeObj(mesh) )
+    for (let i = 0; i < this._threeGroups.length; i++) {
+      this.syncGroup(this._threeGroups[i])
+    }
     // 同步 three 的相机
     three.camera.matrixAutoUpdate = false
     let cvm = cesium.viewer.camera.viewMatrix
@@ -193,8 +205,6 @@ Object.assign(Universe.prototype, {
       cvm[3], cvm[7], cvm[11], cvm[15]
     )
 
-    three.camera.updateProjectionMatrix()
-    let ThreeContainer = document.getElementById("ThreeContainer")
     let width = ThreeContainer.clientWidth
     let height = ThreeContainer.clientHeight
     let aspect = width / height
@@ -208,9 +218,10 @@ Object.assign(Universe.prototype, {
 
 
   renderLoop: function() {
+    // console.log(Object.getOwnPropertyNames(this))
+    requestAnimationFrame(this.renderLoop.bind(this))
     this.cesium.viewer.render()
     this.syncThree()
-    requestAnimationFrame(this.renderLoop).bind(this)
   }
   
 })
@@ -219,7 +230,6 @@ Object.assign(Universe.prototype, {
 let U = new Universe()
 U.collide().then(data => {
   // console.log(data)
-
   // boundaries in WGS84 around the object
   let boundary = {
     minWGS84: [115.23, 39.55],
@@ -228,8 +238,8 @@ U.collide().then(data => {
 
   U.createPlane(boundary, true)
   
-  // 创建 threeObj
-
+  // 根据边界创建 基坐标
+  let group = U.createGroup(boundary)
   let doubleSideMaterial = new THREE.MeshNormalMaterial({
     side: THREE.DoubleSide
   })
@@ -240,10 +250,9 @@ U.collide().then(data => {
   }
   let geometry = new THREE.LatheGeometry(points)
   let latheMesh = new THREE.Mesh(geometry, doubleSideMaterial)
+  window.mesh = latheMesh
   latheMesh.scale.set(1500, 1500, 1500)
-  latheMesh = U.modifyThreeObj(latheMesh, boundary)
-
-  // 
-  console.log(U)
+  U.modifyThreeObj(latheMesh, group)
+  // 帧更新
   U.renderLoop()
 })
