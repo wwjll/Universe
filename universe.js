@@ -210,7 +210,6 @@ function fire(group){
   )
   mesh.scale.set(500, 500, 500)
   mesh.position.y += getHeight(mesh)
-  // mesh.position.y += 5000
   group.add(mesh)
 }
 
@@ -320,11 +319,18 @@ Object.assign(Universe.prototype, {
     this.three.scene.add(group)
     return group
   },
-  modifyThreeObj: function(mesh, group) {
+  modifyThreeObj: function(mesh, group, offset) {
     // 保证转换后的 mesh 坐标在 cesium 球面以上
     console.log(getHeight(mesh))
     // 由于旋转后将 y 轴作为球面法向量, 此时几何体地
     mesh.position.y += getHeight(mesh)
+    if (offset) {
+      // 在 球面 划定 区域内偏移
+      // TODO: need to be test
+      let { x, z } = offset
+      mesh.position.x += x
+      mesh.position.z += z
+    }
     group.add(mesh)
   },
   createPlane: function(boundary, flyto) {
@@ -364,7 +370,7 @@ Object.assign(Universe.prototype, {
     }
   },
 
-  syncGroup: function(group, offset) {
+  syncGroup: function(group) {
     // 物体局部基坐标系永远朝向球心
     let { center, rangeNorm, latDir } = group
     // 先平移
@@ -376,13 +382,6 @@ Object.assign(Universe.prototype, {
     // 最后调整偏移(也是一次旋转)
     group.up.copy(latDir)
 
-    if (offset) {
-      // 在 球面 划定 区域内偏移
-      // TODO: need to be test
-      let { lng, lat } = offSet
-      let cart3 = Cesium.Cartesian3.fromDegrees(lng, lat)
-      group.position.set(cart3.x, cart3.y, cart3.z)
-    }
   },
 
   syncThree: function() {
@@ -462,7 +461,7 @@ U.collide().then(data => {
   window.mesh = latheMesh
   latheMesh.scale.set(500, 500, 500)
   // 
-  // U.modifyThreeObj(latheMesh, group)
+  U.modifyThreeObj(latheMesh, group, { x: 15000, z: 15000 })
   //
   try {
     fire(group)
