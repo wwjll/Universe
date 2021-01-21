@@ -1,6 +1,6 @@
 function getHeight(obj) {
-  // 求解 threeObj 在 y 方向上的长度
-  // 用于 物体局部坐标系转换, 保证绕物体绕 X 轴旋转 90 度后底部处于 Cesium Z 平面上
+  // 求解 threeObj 在 y 方向上的小于 0 的部分的长度
+  
   vertices = obj.geometry.vertices
   let y_arr = vertices.reduce((prev, cur) => {
 
@@ -9,13 +9,16 @@ function getHeight(obj) {
     
   }, [])
   
-  let ymax = y_arr.sort((a, b) => { return a - b})[y_arr.length - 1]
-  let ymin = y_arr.sort((a, b) => { return b - a})[y_arr.length - 1]
-  let scaleY = obj.scale.y
+  let y_max = y_arr.sort((a, b) => { return a - b})[y_arr.length - 1]
+  let y_min = y_arr.sort((a, b) => { return b - a})[y_arr.length - 1]
+  let scale_y = obj.scale.y
+  // 物体实际高度
+  let height = Math.abs(y_max - y_min) * scale_y
+  // 获得 y 切面最小的值, 该值如果小于 0, 则证明该几何体部分位于原点以下, 需要抬升相应的高度
+  let y_diff = y_min < 0 ? Math.abs(y_min) * scale_y : 0
 
-  return Math.abs(ymax - ymin) * scaleY
+  return y_diff
 }
-
 
 function Universe() {
   this._threeGroups = []
@@ -53,6 +56,7 @@ Object.assign(Universe.prototype, {
       // 
       cesium.viewer = function() {
         return new Cesium.Viewer('cesiumContainer', {
+            alpha: false,
             animation: false,       //是否显示动画控件
             homeButton: false,       //是否显示home键
             geocoder: false,         //是否显示地名查找控件        如果设置为true，则无法查询
@@ -107,7 +111,13 @@ Object.assign(Universe.prototype, {
     )
 
     let rangeNorm = Cesium.Cartesian3.fromDegrees((minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2, 1)
+    
     let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize()
+
+    let axes = new THREE.AxesHelper(15000)
+    // axes.position.y += 5000
+    group.add(axes)
+    console.log(axes.position)
 
     group.center = center
     // 基平面法向量
@@ -118,9 +128,11 @@ Object.assign(Universe.prototype, {
     return group
   },
   modifyThreeObj: function(mesh, group) {
-    // debugger
     // 保证转换后的 mesh 坐标在 cesium 球面以上
+    console.log(getHeight(mesh))
+    // 由于旋转后将 y 轴作为球面法向量, 此时几何体地
     mesh.position.y += getHeight(mesh)
+    console.log(mesh.geometry)
     group.add(mesh)
   },
   createPlane: function(boundary, flyto) {
@@ -251,7 +263,7 @@ U.collide().then(data => {
   let geometry = new THREE.LatheGeometry(points)
   let latheMesh = new THREE.Mesh(geometry, doubleSideMaterial)
   window.mesh = latheMesh
-  latheMesh.scale.set(1500, 1500, 1500)
+  latheMesh.scale.set(500, 500, 500)
   U.modifyThreeObj(latheMesh, group)
   // 帧更新
   U.renderLoop()
