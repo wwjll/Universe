@@ -377,6 +377,7 @@ Object.assign(Universe.prototype, {
     group.position.copy(center)
     // 再旋转
     group.lookAt(rangeNorm.x, rangeNorm.y, rangeNorm.z)
+    // group.lookAt(rangeNorm)
     // 旋转基坐标使得 y 轴为上
     group.rotateX(Math.PI / 2)
     // 最后调整偏移(也是一次旋转)
@@ -451,6 +452,7 @@ U.collide().then(data => {
   let doubleSideMaterial = new THREE.MeshNormalMaterial({
     side: THREE.DoubleSide
   })
+  doubleSideMaterial.wireframe = true
   let segments = 10
   let points = []
   for (let i = 0; i < segments; i++) {
@@ -458,7 +460,7 @@ U.collide().then(data => {
   }
   let geometry = new THREE.LatheGeometry(points)
   let latheMesh = new THREE.Mesh(geometry, doubleSideMaterial)
-  window.mesh = latheMesh
+  latheMesh.material.wireflame = true
   latheMesh.scale.set(500, 500, 500)
   // 
   U.modifyThreeObj(latheMesh, group, { x: 15000, z: 15000 })

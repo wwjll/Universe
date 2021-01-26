@@ -3,7 +3,7 @@
 项目参考博客 (https://cesium.com/blog/2017/10/23/integrating-cesium-with-threejs/)
 封装了一个类来同步 threejs 和 cesiumjs 渲染器
 说明: 
-three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分别为(vector) 和 (vector.x, vector.y, vector.z)
+three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分别为(vector) 和 (x, y, z)
 运行:
 直接打开 index.html 或使用 live-server 打开
 
