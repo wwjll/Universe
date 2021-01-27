@@ -3,6 +3,10 @@ const Universe = require('./Core/Universe')
 require('./CesiumThree.css')
 const { createPerlinFire } = require('./ThreeEffects/PerlinFire/index')
 
+setTimeout(() => {
+  console.clear()
+}, 5000)
+
 let U = new Universe.default()
 
 U.collide().then(data => {
@@ -26,7 +30,7 @@ U.collide().then(data => {
   }
   let geometry = new THREE.LatheGeometry(points)
   let latheMesh = new THREE.Mesh(geometry, doubleSideMaterial)
-  latheMesh.material.wireflame = true
+  latheMesh.material.wireframe = true
   latheMesh.scale.set(500, 500, 500)
   // 
   U.modifyThreeObj(latheMesh, group, { x: 15000, z: 15000 })

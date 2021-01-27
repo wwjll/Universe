@@ -3,7 +3,8 @@ const Cesium = require('cesium/Cesium')
 const { getHeight } = require('./utils')
 
 console.warn(THREE.REVISION)
-console.warn(Cesium.VRESION)
+console.warn(Cesium.VERSION)
+
 
 function Universe() {
   this.animateList = []
@@ -17,7 +18,7 @@ Object.assign(Universe.prototype, {
     return new Promise((resolve, reject) => {
       let three = Object.create(null)
       let cesium = Object.create(null)
-  
+      // 
       three.scene = new THREE.Scene()
       three.camera = new THREE.PerspectiveCamera(
         45, 
@@ -39,7 +40,7 @@ Object.assign(Universe.prototype, {
       })
   
       this.ThreeContainer.appendChild(canvas)
-      // 
+      // 创建 cesium 内容
       cesium.viewer = function() {
         return new Cesium.Viewer('cesiumContainer', {
             alpha: false,

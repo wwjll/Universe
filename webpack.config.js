@@ -66,6 +66,13 @@ module.exports = {
             template: 'src/index.html',
             title: 'Hot Module Replacement',
         }),
+        // 拷贝图片到静态目录 
+        new CopywebpackPlugin({
+            patterns: [{ 
+                from: 'src/Assets/images', 
+                to: 'assets/images' 
+            }]
+        }),
         // 拷贝 three 到静态目录 
         new CopywebpackPlugin({
             patterns: [{ 
