@@ -13,12 +13,12 @@ function Universe() {
 }
 Object.assign(Universe.prototype, {
 
-  collide: function() {
+  collide: function(viewer) {
     
     return new Promise((resolve, reject) => {
       let three = Object.create(null)
       let cesium = Object.create(null)
-      // 
+      // Three
       three.scene = new THREE.Scene()
       three.camera = new THREE.PerspectiveCamera(
         45, 
@@ -38,35 +38,35 @@ Object.assign(Universe.prototype, {
         canvas: this.ThreeContainer,
         context: context
       })
-  
       this.ThreeContainer.appendChild(canvas)
-      // 创建 cesium 内容
-      cesium.viewer = function() {
-        return new Cesium.Viewer('cesiumContainer', {
-            alpha: false,
-            animation: false,       //是否显示动画控件
-            homeButton: false,       //是否显示home键
-            geocoder: false,         //是否显示地名查找控件        如果设置为true，则无法查询
-            baseLayerPicker: false, //是否显示图层选择控件
-            timeline: false,        //是否显示时间线控件
-            fullscreenButton: false, //是否全屏显示
-            scene3DOnly: true,     //如果设置为true，则所有几何图形以3D模式绘制以节约GPU资源
-            infoBox: false,         //是否显示点击要素之后显示的信息
-            sceneModePicker: false,  //是否显示投影方式控件  三维/二维
-            navigationInstructionsInitiallyVisible: false,
-            navigationHelpButton: false,     //是否显示帮助信息控件
-            selectionIndicator: false,        //是否显示指示器组件
-            imageryProvider: new Cesium.UrlTemplateImageryProvider({
-              url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
-            }),
-            fullscreenElement: 'cesiumContainer'
-          });
-      }()
-      // 预先同步一些属性
+      //  Cesium
+      if (!viewer) {
+        cesium.viewer = new Cesium.Viewer('cesiumContainer', {
+          alpha: false,
+          animation: false,       //是否显示动画控件
+          homeButton: false,       //是否显示home键
+          geocoder: false,         //是否显示地名查找控件        如果设置为true，则无法查询
+          baseLayerPicker: false, //是否显示图层选择控件
+          timeline: false,        //是否显示时间线控件
+          fullscreenButton: false, //是否全屏显示
+          scene3DOnly: true,     //如果设置为true，则所有几何图形以3D模式绘制以节约GPU资源
+          infoBox: false,         //是否显示点击要素之后显示的信息
+          sceneModePicker: false,  //是否显示投影方式控件  三维/二维
+          navigationInstructionsInitiallyVisible: false,
+          navigationHelpButton: false,     //是否显示帮助信息控件
+          selectionIndicator: false,        //是否显示指示器组件
+          imageryProvider: new Cesium.UrlTemplateImageryProvider({
+            url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
+          }),
+          fullscreenElement: 'cesiumContainer'
+        })
+      }
+
+      // 预先同步相机 fov
       three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy)
       this.three = three
       this.cesium = cesium
-      // 
+      // 该 promise 状态置于 resolved
       resolve({ cesium, three })
     })
   },
@@ -101,7 +101,6 @@ Object.assign(Universe.prototype, {
     let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize()
 
     let axes = new THREE.AxesHelper(15000)
-    // axes.position.y += 5000
     group.add(axes)
 
     group.center = center
@@ -228,4 +227,27 @@ Object.assign(Universe.prototype, {
   
 })
 
-export default Universe;
+
+// (function (global, factory) {
+// 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+// 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+// 	(global = global || self, factory(global.Universe = {}));
+// }(this, (function (exports) { 
+//   'use strict';
+//   // code 
+// })))
+
+// 支持 script 和 module 引入, script 引入需要先引入 cesium 和 three
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = Universe;
+}
+else {
+  if (typeof define === 'function' && define.amd) {
+    define([], function() {
+      return Universe;
+    });
+  }
+  else {
+    window.Universe = Universe;
+  }
+}
