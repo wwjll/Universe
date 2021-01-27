@@ -1,6 +1,6 @@
-# CesiumThreejs.Demo
 
-项目参考博客 (https://cesium.com/blog/2017/10/23/integrating-cesium-with-threejs/)
+
+Universe 类的实现参考博客 (https://cesium.com/blog/2017/10/23/integrating-cesium-with-threejs/)
 封装了一个类来同步 threejs 和 cesiumjs 渲染器
 说明: 
 three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分别为(vector) 和 (x, y, z)
@@ -9,9 +9,11 @@ three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分�
 清除控制台关于卫星底图的加载信息：
 1.node_modules/cesium/Source/Core/TileProviderError 
 148 行增加：
+```
 if (provider.constructor.name === 'UrlTemplateImageryProvider') return
-
-2.
+```
+2.控制台 devtool 里使用过滤器过滤 ```console.error``` 信息或 使用定时器执行 
+```console.clear()``` 来清空
 
 原理:
 1. 根据 wgs84 经纬度创建一个范围
