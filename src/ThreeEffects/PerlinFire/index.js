@@ -162,36 +162,56 @@ const fragmentShader =
   }
 `
 
-const { getHeight } = require('../../Core/utils')
-const THREE = require('three/build/three')
+if (typeof(require) === 'function' && global === global) {
+  global.Utils = require('../../Core/Utils')
+  global.THREE = require('three/build/three')
+}
 
-module.exports = {
-  createPerlinFire: function(group) {
-    const texture = new THREE.TextureLoader().load('http://localhost:3000/texture.webp')
+setTimeout(() => {
+  console.clear()
+})
 
-    let material = new THREE.ShaderMaterial({
-      uniforms: {
-          tExplosion: {
-              type: "t",
-              value: texture
-          },
-          time: {
-              type: "f",
-              value: 0.0
-          }
-      },
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader
-    })
-  
-    // 创建一个球体并贴上材质
-    mesh = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(20, 4 ),
-        material
-    )
-    mesh.scale.set(500, 500, 500)
-    mesh.position.y += getHeight(mesh)
-    group.add(mesh)
-    return mesh
+const createPerlinFire = function(group) {
+  const { getHeight } = Utils
+  const texture = new THREE.TextureLoader().load('http://localhost:3000/texture.webp')
+
+  let material = new THREE.ShaderMaterial({
+    uniforms: {
+        tExplosion: {
+            type: "t",
+            value: texture
+        },
+        time: {
+            type: "f",
+            value: 0.0
+        }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader
+  })
+
+  // 创建一个球体并贴上材质
+  mesh = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(20, 4 ),
+      material
+  )
+  mesh.scale.set(500, 500, 500)
+  mesh.position.y += getHeight(mesh)
+  group.add(mesh)
+  return mesh
+}
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = createPerlinFire;
+}
+else {
+  if (typeof define === 'function' && define.amd) {
+    define([], function() {
+      return createPerlinFire;
+    });
+  }
+  else {
+    window.createPerlinFire = createPerlinFire;
   }
 }
+

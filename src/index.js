@@ -1,11 +1,15 @@
-const THREE = require('three/src/Three')
-const Universe = require('./Core/Universe')
-require('./CesiumThree.css')
-const { createPerlinFire } = require('./ThreeEffects/PerlinFire/index')
+// 支持标签引入
+if (typeof(require) === 'function' && global === global) {
+  require('./CesiumThree.css')
+  global.Universe = require('./Core/Universe')
+  global.Cesium = require('cesium/Cesium')
+  global.THREE = require('three/build/three')
+  global.createPerlinFire = require('./ThreeEffects/PerlinFire/index')
+}
 
-setTimeout(() => {
-  console.clear()
-}, 5000)
+// setTimeout(() => {
+//   console.clear()
+// }, 5000)
 
 // 
 function createLatheMesh(group, U) {

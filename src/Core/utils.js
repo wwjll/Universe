@@ -1,7 +1,6 @@
-module.exports = {
+const Utils = {
   getHeight: function (obj) {
     // 求解 threeObj 在 y 方向上的小于 0 的部分的长度
-    
     vertices = obj.geometry.vertices
     let y_arr = vertices.reduce((prev, cur) => {
   
@@ -20,6 +19,34 @@ module.exports = {
     let y_diff = y_min < 0 ? Math.abs(y_min) * scale_y : 0
   
     return y_diff
-  }
+  },
   
+  // 球面两点距离计算函数
+  getSpaceDistance: function(positions) {
+    var distance = 0;
+    for (var i = 0; i < positions.length - 1; i++) {
+      var point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
+      var point2cartographic = Cesium.Cartographic.fromCartesian(positions[i + 1]);
+      var geodesic = new Cesium.EllipsoidGeodesic();
+      geodesic.setEndPoints(point1cartographic, point2cartographic);
+      var s = geodesic.surfaceDistance;
+      s = Math.sqrt(Math.pow(s, 2) + Math.pow(point2cartographic.height - point1cartographic.height, 2));
+      distance = distance + s;
+    }
+    return distance.toFixed(2);
+  }
+}
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = Utils;
+}
+else {
+  if (typeof define === 'function' && define.amd) {
+    define([], function() {
+      return Utils;
+    });
+  }
+  else {
+    window.Utils = Utils;
+  }
 }

@@ -1,6 +1,9 @@
-const THREE = require('three/build/three')
-const Cesium = require('cesium/Cesium')
-const { getHeight } = require('./utils')
+
+if (typeof(require) === 'function' && global === global) {
+    global.Cesium = require('cesium/Cesium')
+    global.THREE = require('three/build/three')
+    global.Utils = require('./Utils')
+}
 
 console.warn(THREE.REVISION)
 console.warn(Cesium.VERSION)
@@ -112,6 +115,7 @@ Object.assign(Universe.prototype, {
     return group
   },
   modifyThreeObj: function(mesh, group, offset) {
+    const { getHeight } = Utils
     // 保证转换后的 mesh 坐标在 cesium 球面以上
     mesh.position.y += getHeight(mesh)
     if (offset) {
