@@ -1,6 +1,6 @@
-if (typeof(require) == 'function') {
-  require('cesium/Source/Cesium')
-  require('../../Core/Measure')
+if (typeof(require) == 'function' && global == global) {
+  const Cesium = require('cesium/Source/Cesium')
+  const MeasureTool = require('../../Core/Measure')
 }
 
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -22,3 +22,15 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   }),
   fullscreenElement: 'cesiumContainer'
 })
+
+// cesium 显示窗口的像素缩放比例等于设备的像素缩放比例
+if(Cesium.FeatureDetection.supportsImageRenderingPixelated()){
+  viewer.resolutionScale = window.devicePixelRatio;
+}
+
+//是否开启抗锯齿
+viewer.scene.fxaa = true;
+viewer.scene.postProcessStages.fxaa.enabled = true;
+// 
+const M = new MeasureTool(viewer)
+M.switchCommand('area')

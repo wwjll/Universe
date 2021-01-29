@@ -63,8 +63,9 @@ Object.assign(Universe.prototype, {
           }),
           fullscreenElement: 'cesiumContainer'
         })
+      } else {
+        cesium.viewer = viewer
       }
-
       // 预先同步相机 fov
       three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy)
       this.three = three

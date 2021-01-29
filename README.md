@@ -12,7 +12,7 @@ three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分�
 5. 每帧更新 three 相机的 view 矩阵 (matrixWordInverse) 和其逆矩阵 （matrixWorld)
 
 
-## tips
+## Tips
 ### 1.清除控制台关于卫星底图的加载信息：</br>
 1.node_modules/cesium/Source/Core/TileProviderError 
 148 行增加：
@@ -24,5 +24,8 @@ if (provider.constructor.name === 'UrlTemplateImageryProvider') return
 
 ### 2.例子程序
 src/demos 里的项目在 npm i 后即可在 vscode 里用 live-server 打开 html </br>
+
+## History
+### 2021.01.28: 
 
 
