@@ -167,13 +167,9 @@ if (typeof(require) === 'function' && global === global) {
   global.THREE = require('three/build/three')
 }
 
-setTimeout(() => {
-  console.clear()
-})
-
 const createPerlinFire = function(group) {
   const { getHeight } = Utils
-  const texture = new THREE.TextureLoader().load('http://localhost:3000/texture.webp')
+  const texture = new THREE.TextureLoader().load('http://localhost:3000/images/texture.webp')
 
   let material = new THREE.ShaderMaterial({
     uniforms: {

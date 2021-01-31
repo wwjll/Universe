@@ -1,23 +1,24 @@
 
 if (typeof(require) === 'function' && global === global) {
-    global.Cesium = require('cesium/Cesium')
-    global.THREE = require('three/build/three')
-    global.Utils = require('./Utils')
+  global.Cesium = require('cesium/Cesium')
+  global.THREE = require('three/build/three')
+  global.Utils = require('./Utils')
 }
 
 console.warn(THREE.REVISION)
 console.warn(Cesium.VERSION)
 
-
+// 
 function Universe() {
   this.animateList = []
   this._threeGroups = []
   this.ThreeContainer = document.getElementById("ThreeContainer")
+
 }
 Object.assign(Universe.prototype, {
 
   collide: function(viewer) {
-    
+
     return new Promise((resolve, reject) => {
       let three = Object.create(null)
       let cesium = Object.create(null)
@@ -26,7 +27,7 @@ Object.assign(Universe.prototype, {
       three.camera = new THREE.PerspectiveCamera(
         45, 
         window.innerWidth / window.innerHeight, 
-        1, 
+        0.1, 
         10 * 1000 * 1000
       )
   
@@ -39,12 +40,14 @@ Object.assign(Universe.prototype, {
       })
       three.renderer = new THREE.WebGLRenderer({ 
         canvas: this.ThreeContainer,
-        context: context
+        context: context,
+        antialias : true
       })
       this.ThreeContainer.appendChild(canvas)
       //  Cesium
       if (!viewer) {
         cesium.viewer = new Cesium.Viewer('cesiumContainer', {
+          useDefaultRenderLoop: false,
           alpha: false,
           animation: false,       //是否显示动画控件
           homeButton: false,       //是否显示home键
@@ -63,13 +66,26 @@ Object.assign(Universe.prototype, {
           }),
           fullscreenElement: 'cesiumContainer'
         })
+
       } else {
+
         cesium.viewer = viewer
       }
       // 预先同步相机 fov
       three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy)
       this.three = three
       this.cesium = cesium
+
+      const _this = this
+      window.onresize = function() {        
+        three.camera.fov = Cesium.Math.toDegrees(cesium.viewer.camera.frustum.fovy)
+        three.camera.updateProjectionMatrix()
+        // 手动处理 resize 的时候 ThreeContainer 里的 canvas 尺寸没有随之改变
+        three.renderer.setSize(window.innerWidth, window.innerHeight)
+        _this.ThreeContainer.childNodes[0].width = window.innerWidth
+        _this.ThreeContainer.childNodes[0].height = window.innerHeight
+        
+      }
       // 该 promise 状态置于 resolved
       resolve({ cesium, three })
     })
@@ -166,16 +182,17 @@ Object.assign(Universe.prototype, {
 
   syncGroup: function(group) {
     // 物体局部基坐标系永远朝向球心
-    let { center, rangeNorm, latDir } = group
-    // 先平移
+    let { center, rangeNorm, latDir, boundary } = group
+
+    // 先平移 
     group.position.copy(center)
     // 再旋转
     group.lookAt(rangeNorm.x, rangeNorm.y, rangeNorm.z)
-    // group.lookAt(rangeNorm)
     // 旋转基坐标使得 y 轴为上
     group.rotateX(Math.PI / 2)
     // 最后调整偏移(也是一次旋转)
     group.up.copy(latDir)
+    // TODO: 尝试处理 resize y轴方向不同步问题
 
   },
 
@@ -203,13 +220,9 @@ Object.assign(Universe.prototype, {
       cvm[3], cvm[7], cvm[11], cvm[15]
     )
 
-    let width = ThreeContainer.clientWidth
-    let height = ThreeContainer.clientHeight
-    let aspect = width / height
-    three.camera.aspect = aspect
+    three.camera.aspect = cesium.viewer.camera.frustum.aspectRatio
     three.camera.updateProjectionMatrix()
 
-    three.renderer.setSize(width, height)
     three.renderer.clear()
     three.renderer.render(three.scene, three.camera)
   },
@@ -219,6 +232,7 @@ Object.assign(Universe.prototype, {
   },
   renderLoop: function() {
     requestAnimationFrame(this.renderLoop.bind(this))
+    // this.cesium.viewer.resize()
     this.cesium.viewer.render()
     this.syncThree()
     try {
@@ -231,16 +245,6 @@ Object.assign(Universe.prototype, {
   }
   
 })
-
-
-// (function (global, factory) {
-// 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-// 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-// 	(global = global || self, factory(global.Universe = {}));
-// }(this, (function (exports) { 
-//   'use strict';
-//   // code 
-// })))
 
 // 支持 script 和 module 引入, script 引入需要先引入 cesium 和 three
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
@@ -256,3 +260,11 @@ else {
     window.Universe = Universe;
   }
 }
+// (function (global, factory) {
+// 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+// 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+// 	(global = global || self, factory(global.Universe = {}));
+// }(this, (function (exports) { 
+//   'use strict';
+//   // code 
+// })))

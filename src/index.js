@@ -7,10 +7,6 @@ if (typeof(require) === 'function' && global === global) {
   global.createPerlinFire = require('./ThreeEffects/PerlinFire/index')
 }
 
-// setTimeout(() => {
-//   console.clear()
-// }, 5000)
-
 // 
 function createLatheMesh(group, U) {
   let doubleSideMaterial = new THREE.MeshNormalMaterial({
@@ -33,9 +29,19 @@ function createLatheMesh(group, U) {
 let U = new Universe()
 U.collide().then(data => {
   // boundaries in WGS84 around the object
+  // let boundary = {
+  //   minWGS84: [115.23, 39.55],
+  //   maxWGS84: [116.23, 41.55]
+  // }
   let boundary = {
-    minWGS84: [115.23, 39.55],
-    maxWGS84: [116.23, 41.55]
+    minWGS84:           [
+      109.9072265625,
+      -69.97549253616161
+    ],
+    maxWGS84:           [
+      112.1044921875,
+      -70.32613725493573
+    ]
   }
   U.createPlane(boundary, true)
   // 根据边界创建 基坐标
