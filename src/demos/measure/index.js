@@ -31,6 +31,6 @@ if(Cesium.FeatureDetection.supportsImageRenderingPixelated()){
 //是否开启抗锯齿
 viewer.scene.fxaa = true;
 viewer.scene.postProcessStages.fxaa.enabled = true;
-// 
+// 测绘管理类
 const M = new MeasureTool(viewer)
 M.switchCommand('area')

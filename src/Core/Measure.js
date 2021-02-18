@@ -205,12 +205,12 @@ Object.assign(MeasureTool.prototype, {
       polygons.push({
         name: `多边形${polygons.length}`
       })
-      // TODO 
+      // TODO:
       // 1.假设开始的三个点为 ABC, 求有序点位的实时三角面叠加面积, P 点在 ABC 的 OBB 包围面外部
       //   有序的求解：任意个数的时候利用重心三角坐标判断 B 点是否在 P 点与 AC 围成的 ACP 三角形内部, 
       //              若是违背了有序, 过滤处理。推理依据：初始的三个点已经形成了有序多边形的方向。
       // 2.根据有序的点位实时计算三角面积，右击后保存结果
-      // 3.根据球面微分求得球面三角面积 R^2(A + B + C - PI)
+      // 3.根据球面三角面积 R^2(A + B + C - PI)
       // 4.考虑到 WGS84 的椭球体曲率该怎么算呢？
       let textArea = getArea(tempPoints) + "平方公里"
       viewer.entities.add({

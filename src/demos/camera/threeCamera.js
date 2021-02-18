@@ -168,7 +168,8 @@ loader.load(
     //
     // spaceDecompose();
 
-    //
+    // TODO: 相机管理
+    // TODO: dat.gui 面板
     // addCamera()
     // initDragControls()
 

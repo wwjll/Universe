@@ -4,6 +4,7 @@ if (typeof require === "function" && global === global) {
   global.Cesium = require("cesium/Cesium")
 }
 
+const sourcePath = "http://localhost:3000/"
 const viewer = new Cesium.Viewer('cesiumContainer', {
   useDefaultRenderLoop: true,
   alpha: false,
@@ -19,29 +20,36 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   navigationInstructionsInitiallyVisible: false,
   navigationHelpButton: false,     //是否显示帮助信息控件
   selectionIndicator: false,        //是否显示指示器组件
-  imageryProvider: new Cesium.UrlTemplateImageryProvider({
-    url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
-  }),
-  // imageryProvider: new Cesium.TileMapServiceImageryProvider({
-  //   url: new Cesium.buildModuleUrl("node_modules/cesium/SourceAssets/Textures/NaturalEarthII")
+  // imageryProvider: new Cesium.UrlTemplateImageryProvider({
+  //   url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
   // }),
+  terrainProvider : new Cesium.createWorldTerrain(),
   fullscreenElement: 'cesiumContainer'
 })
+// 开启地形检测
+viewer.scene.globe.depthTestAgainstTerrain = true
+// 判断是否支持图像渲染像素化处理
+if (Cesium.FeatureDetection.supportsImageRenderingPixelated()) { 
+  viewer.resolutionScale = window.devicePixelRatio
+}
+// 开启抗锯齿
+viewer.scene.fxaa = true
+viewer.scene.postProcessStages.fxaa.enabled = true
 
 const dataSource = new Cesium.CustomDataSource('buildings')
 viewer.dataSources.add(dataSource)
 
-axios.get('http://localhost:3000/1111.geojson').then((json) => {
+axios.get(sourcePath + 'geojson-buildings/quangang.geojson').then((json) => {
   let result = json.data.features
   result.forEach(item => {
     let positions = item.geometry.coordinates[0][0]
     let positionArr = positions.reduce((prev, cur) => {
-      // let temp = gcj02_to_wgs84(cur[0], cur[1])
-      // prev.push(temp.longitude)
-      // prev.push(temp.latitude)
+      let temp = Utils.gcj02_to_wgs84(cur[0], cur[1])
+      prev.push(temp.longitude)
+      prev.push(temp.latitude)
       // 未作偏移处理
-      prev.push(cur[0])
-      prev.push(cur[1])
+      // prev.push(cur[0])
+      // prev.push(cur[1])
       return prev
     }, [])
     let lvalue = item.properties.height
@@ -70,7 +78,22 @@ axios.get('http://localhost:3000/1111.geojson').then((json) => {
         outlineColor: Cesium.Color.YELLOW,
         outline: false,
         fill: true,
-        material: Cesium.Color.fromCssColorString('rgb(' + color + ')'),
+        // material: Cesium.Color.fromCssColorString('rgb(' + color + ')'),
+        // material: new Cesium.GridMaterialProperty({
+        //   color : Cesium.Color.YELLOW,
+        //   cellAlpha : 0.2,
+        //   lineCount : new Cesium.Cartesian2(8, 8),
+        //   lineThickness : new Cesium.Cartesian2(2.0, 2.0)
+        // }),
+        material: new Cesium.CheckerboardMaterialProperty({
+          evenColor : Cesium.Color.WHITE,
+          oddColor : Cesium.Color.BLACK,
+          repeat : new Cesium.Cartesian2(4,4)
+        }),
+        // material: new Cesium.ImageMaterialProperty({
+        //   image: sourcePath + '/images/brick.jpeg',
+        //   repeat : new Cesium.Cartesian2(2, 1)
+        // }),
         hierarchy: Cesium.Cartesian3.fromDegreesArray(positionArr)
       }
     })

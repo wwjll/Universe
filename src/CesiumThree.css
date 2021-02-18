@@ -59,3 +59,7 @@ body {
     background-repeat: no-repeat;
     /* background-image: url(Images/ajax-loader.gif); */
 }
+
+.cesium-viewer-bottom {
+  display: none;
+}
