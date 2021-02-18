@@ -64,6 +64,9 @@ Object.assign(Universe.prototype, {
           imageryProvider: new Cesium.UrlTemplateImageryProvider({
             url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
           }),
+          // imageryProvider: new Cesium.TileMapServiceImageryProvider({
+          //   url: new Cesium.buildModuleUrl("node_modules/cesium/SourceAssets/Textures/NaturalEarthII")
+          // }),
           fullscreenElement: 'cesiumContainer'
         })
 

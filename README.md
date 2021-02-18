@@ -22,8 +22,12 @@ if (provider.constructor.name === 'UrlTemplateImageryProvider') return
 2.控制台 devtool 里使用过滤器过滤 ```console.error``` 信息或 使用定时器执行 
 ```console.clear()``` 来清空
 
-### 2.例子程序
+## 2.例子程序
+### 启动：
+1. 进入 Assets 目录下启动静态资源服务器
+  ```http-server --cors -p 3000 ```
 src/demos 里的项目在 npm i 后即可在 vscode 里用 live-server 打开 html </br>
+
 
 ## History
 ### 2021.01.28: 

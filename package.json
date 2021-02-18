@@ -20,6 +20,7 @@
   "homepage": "https://github.com/wwjll/Universe#readme",
   "dependencies": {
     "@babel/core": "^7.12.10",
+    "axios": "^0.21.1",
     "babel-loader": "^8.2.2",
     "cesium": "^1.77.0",
     "three": "^0.117.0",
