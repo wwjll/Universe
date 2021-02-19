@@ -149,6 +149,8 @@ const Utils = {
   
   // 球面两点距离计算函数
   getSpaceDistance: function(positions) {
+    // 使用绘地线和高度综合计算两点间距离,如果 positions 数组长度大于 2, 会逐一计算各点距离并叠加返回
+    // positions: [[lng,lat,alt=0],[lng,lat,alt=0]]。数据为经纬度坐标。
     var distance = 0;
     for (var i = 0; i < positions.length - 1; i++) {
       var point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
@@ -160,6 +162,16 @@ const Utils = {
       distance = distance + s;
     }
     return distance.toFixed(2);
+  },
+
+  // 传入经纬度小数的经纬度数字，转换成度分秒形式
+  transformLonLat(num) {
+    let degree = Math.floor(num)
+    let sub = (num - degree) * 60
+    let minute = Math.floor(sub)
+    let sub2 = (sub - minute) * 60
+    let second = Math.floor(sub2)
+    return `${degree}°${minute}′${second}″`
   }
 
 }

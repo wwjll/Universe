@@ -2,6 +2,7 @@
 if (typeof require === "function" && global === global) {
   require("./CesiumThree.css")
   global.Cesium = require("cesium/Cesium")
+  global.axios = require('axios')
 }
 
 const sourcePath = "http://localhost:3000/"
@@ -73,10 +74,10 @@ axios.get(sourcePath + 'geojson-buildings/quangang.geojson').then((json) => {
     }
     let entity = new Cesium.Entity({
       polygon: {
-        name: item.properties.floor,
+        name: 'Polygon',
         extrudedHeight: lvalue,
         outlineColor: Cesium.Color.YELLOW,
-        outline: false,
+        outline: true,
         fill: true,
         // material: Cesium.Color.fromCssColorString('rgb(' + color + ')'),
         // material: new Cesium.GridMaterialProperty({

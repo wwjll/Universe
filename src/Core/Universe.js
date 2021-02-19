@@ -195,8 +195,6 @@ Object.assign(Universe.prototype, {
     group.rotateX(Math.PI / 2)
     // 最后调整偏移(也是一次旋转)
     group.up.copy(latDir)
-    // TODO: 尝试处理 resize y轴方向不同步问题
-
   },
 
   syncThree: function() {
