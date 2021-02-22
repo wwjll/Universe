@@ -1,8 +1,8 @@
 
 ## Universe 类说明: 
-封装了一个类来同步 threejs 和 cesiumjs 渲染器
+封装了一个类来同步 threejs 和 cesiumjs 渲染器 </br>
 实现参考博客 (https://cesium.com/blog/2017/10/23/integrating-cesium-with-threejs/)
-three 版本 r87 前后分别只需要更改代码中 LookAt 位置, 参数分别为 (vector) 和 (x, y, z)
+three 版本 r87 之前需要更改代码中 LookAt 的参数: lookAt(THREE.Vector3(x, y, z))
 
 原理:
 1. 根据 wgs84 经纬度创建一个范围

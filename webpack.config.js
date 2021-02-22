@@ -23,7 +23,7 @@ module.exports = {
     output: {
         path: resolve(__dirname, 'build'),
         filename: 'build[hash:16].js',
-        //需要编译Cesium中的多行字符串 
+        //需要编译 Cesium 中的多行字符串 
         sourcePrefix: ''
     },
     module: {
