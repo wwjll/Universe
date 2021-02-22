@@ -173,14 +173,14 @@ const createPerlinFire = function(group) {
 
   let material = new THREE.ShaderMaterial({
     uniforms: {
-        tExplosion: {
-            type: "t",
-            value: texture
-        },
-        time: {
-            type: "f",
-            value: 0.0
-        }
+      tExplosion: {
+          type: "t",
+          value: texture
+      },
+      time: {
+          type: "f",
+          value: 0.0
+      }
     },
     vertexShader: vertexShader,
     fragmentShader: fragmentShader
@@ -188,8 +188,8 @@ const createPerlinFire = function(group) {
 
   // 创建一个球体并贴上材质
   mesh = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(20, 4 ),
-      material
+    new THREE.IcosahedronGeometry(20, 4 ),
+    material
   )
   mesh.scale.set(500, 500, 500)
   mesh.position.y += getHeight(mesh)

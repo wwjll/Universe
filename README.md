@@ -29,7 +29,4 @@ if (provider.constructor.name === 'UrlTemplateImageryProvider') return
 src/demos 里的项目在 npm i 后即可在 vscode 里用 live-server 打开 html </br>
 
 
-## History
-### 2021.01.28: 
-
 
