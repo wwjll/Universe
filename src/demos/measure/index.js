@@ -17,9 +17,9 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   navigationInstructionsInitiallyVisible: false,
   navigationHelpButton: false,     //是否显示帮助信息控件
   selectionIndicator: false,        //是否显示指示器组件
-  imageryProvider: new Cesium.UrlTemplateImageryProvider({
-    url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
-  }),
+  // imageryProvider: new Cesium.UrlTemplateImageryProvider({
+  //   url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
+  // }),
   fullscreenElement: 'cesiumContainer'
 })
 
@@ -34,3 +34,5 @@ viewer.scene.postProcessStages.fxaa.enabled = true;
 // 测绘管理类
 const M = new MeasureTool(viewer)
 M.switchCommand('area')
+// TODO: 用 dat.gui 来切换绘制方法
+

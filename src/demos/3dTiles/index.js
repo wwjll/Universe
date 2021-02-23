@@ -5,7 +5,7 @@ if (typeof require === "function" && global === global) {
   global.axios = require("axios")
 }
 
-const sourcePath = "http://localhost:3000/"
+const url = "/src/Assets/3dtiles/amoy/tileset.json"
 const viewer = new Cesium.Viewer("cesiumContainer", {
   useDefaultRenderLoop: true,
   alpha: false,
@@ -38,7 +38,7 @@ viewer.scene.fxaa = true
 viewer.scene.postProcessStages.fxaa.enabled = true
 
 var tileset = new Cesium.Cesium3DTileset({
-  url: sourcePath + "3dtiles/amoy/tileset.json",
+  url: url,
 })
 
 viewer.scene.primitives.add(tileset)

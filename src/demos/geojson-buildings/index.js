@@ -5,7 +5,7 @@ if (typeof require === "function" && global === global) {
   global.axios = require('axios')
 }
 
-const sourcePath = "http://localhost:3000/"
+const url = "/src/Assets/geojson-buildings/quangang.geojson"
 const viewer = new Cesium.Viewer('cesiumContainer', {
   useDefaultRenderLoop: true,
   alpha: false,
@@ -40,7 +40,7 @@ viewer.scene.postProcessStages.fxaa.enabled = true
 const dataSource = new Cesium.CustomDataSource('buildings')
 viewer.dataSources.add(dataSource)
 
-axios.get(sourcePath + 'geojson-buildings/quangang.geojson').then((json) => {
+axios.get(url).then((json) => {
   let result = json.data.features
   result.forEach(item => {
     let positions = item.geometry.coordinates[0][0]
@@ -72,6 +72,7 @@ axios.get(sourcePath + 'geojson-buildings/quangang.geojson').then((json) => {
     } else {
       color = '208,36,14'
     }
+    // TODO: 用 dat.gui 来切换材质
     let entity = new Cesium.Entity({
       polygon: {
         name: 'Polygon',

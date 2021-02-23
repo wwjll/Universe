@@ -48,6 +48,7 @@ viewer.camera.flyTo({
   )
 })
 
+const url = "/src/Assets/geojson/water.geojson"
 let water = new Water(viewer)
-water.addWaterRegion('http://localhost:3000/geojson/water.geojson')
+water.addWaterRegion(url)
 
