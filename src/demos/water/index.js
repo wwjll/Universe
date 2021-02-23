@@ -1,7 +1,7 @@
 // 支持标签引入
 if (typeof require === "function" && global === global) {
   require("./CesiumThree.css")
-  global.Cesium = require("cesium/Cesium")
+  require("cesium/Cesium")
 }
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -36,17 +36,18 @@ viewer.scene.fxaa = true
 viewer.scene.postProcessStages.fxaa.enabled = true
 
 const position = {
-  longitude: 118.095814,
-  latitude: 24.48628,
+  longitude: 118.9785,
+  latitude: 25.2074,
 }
 // 移动到目标
 viewer.camera.flyTo({
   destination: Cesium.Cartesian3.fromDegrees(
     position.longitude,
     position.latitude,
-    2000
+    50000
   )
 })
 
-const radar = new PlaneRadar(viewer)
-radar.addRadar(position, 1000, Cesium.Color.GREEN, 3000) 
+let water = new Water(viewer)
+water.addWaterRegion('http://localhost:3000/geojson/water.geojson')
+

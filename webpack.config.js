@@ -57,7 +57,7 @@ module.exports = {
         }
     },
     amd: {
-        //允许Cesium兼容 webpack的 require 方式 
+        // 允许 Cesium 兼容 require 方式 
         toUrlUndefined: true
     },
     plugins: [

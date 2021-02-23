@@ -236,7 +236,7 @@ Object.assign(PlaneRadar.prototype, {
       "{" +
       "float dis1= length(prjOnPlane.xyz - lineEndPt);" +
       "f = abs(twou_radius - dis1) / twou_radius;" +
-      "f = pow(f, 4.0);" +
+      "f = pow(f, 6.0);" +
       "}" +
       "gl_FragColor = mix(gl_FragColor, u_scanColor, f + f0);" +
       "}" +
