@@ -1,3 +1,4 @@
+
 // 支持标签引入
 if (typeof require === "function" && global === global) {
   require("./CesiumThree.css")
@@ -24,7 +25,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
   // imageryProvider: new Cesium.UrlTemplateImageryProvider({
   //   url: 'http://localhost:9000/image/519ed030403c11eb88ad417b15d3ec62/{z}/{x}/{y}'
   // }),
-  terrainProvider: new Cesium.createWorldTerrain(),
+  // terrainProvider: new Cesium.createWorldTerrain(),
   fullscreenElement: "cesiumContainer",
 })
 // 开启地形检测
@@ -55,7 +56,6 @@ viewer.scene.primitives.add(tileset)
 //     Cesium.Matrix4.multiply(mat, rotationX, mat);
 //     tileset._root.transform = mat;
 // })
-
 
 // 颜色的设置
 tileset.style = new Cesium.Cesium3DTileStyle({
@@ -121,7 +121,8 @@ viewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
   }
   // A feature was picked, so show its overlay content
   nameOverlay.style.display = "block"
-  nameOverlay.style.bottom = viewer.canvas.clientHeight - movement.endPosition.y + "px"
+  nameOverlay.style.bottom =
+    viewer.canvas.clientHeight - movement.endPosition.y + "px"
   nameOverlay.style.left = movement.endPosition.x + "px"
   var name = pickedFeature.getProperty("name")
   if (!Cesium.defined(name)) {
